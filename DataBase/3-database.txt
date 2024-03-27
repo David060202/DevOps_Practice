@@ -1,0 +1,45 @@
+Start by pulling the appropriate Docker image for MySQL. 
+docker pull mysql/mysql-server:latest
+
+
+Then i ran a container named mysql-db with a set password and i created a
+database named company:
+
+
+docker run --name mysql-db -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:latest
+docker exec -it mysql-db mysql -uroot -pmy-secret-pw -e "CREATE DATABASE company;"
+
+Then i copied the company.sql file into the container.
+docker cp /path/to/company.sql mysql-db:/company.sql
+
+Then when i tried importing the sql dump into the "company" database i ran into
+some problems. 
+
+docker exec -i mysql-db mysql -uroot -pmy-secret-pw company < /company.sql
+
+After this i entered the bash : 
+
+docker exec -it mysql-db bash 
+
+and tried to do it manually with :
+ mysql -uroot -pmy-secret-pw company < company.sql
+
+and i received an error.
+
+Seems like the database you provided had a variable declared as integer and you
+supplied a String(Department). After i deleted the container and restarted,
+everything ran smoothly and i was capable after some research to create a new user
+with permissions on the company database:
+
+docker exec -it mysql-db mysql -uroot -pmy-secret-pw -e "CREATE USER 'newuser'@'%' IDENTIFIED BY 'password';"
+docker exec -it mysql-db mysql -uroot -pmy-secret-pw -e "GRANT ALL PRIVILEGES ON company.* TO 'newuser'@'%';"
+docker exec -it mysql-db mysql -uroot -pmy-secret-pw -e "FLUSH PRIVILEGES;"
+
+Then i found the average salary for every department:
+
+docker exec -it mysql-db mysql -uroot -pmy-secret-pw -e "USE company; SELECT department, AVG(salary) AS avg_salary FROM employees GROUP BY department;"
+
+
+As a sidenote: This is my first year working with databases and i mainly work in MySQL directly, so
+trying to use the docker and containers was an interesting twist and a lot to learn
+from.
