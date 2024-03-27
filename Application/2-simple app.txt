@@ -1,0 +1,27 @@
+We are using a Dockerfile:
+# Use Python 3.9 base image
+FROM python:3.9
+
+# Set working directory in the container
+WORKDIR /app
+
+# Copy the Python application file into the container
+COPY app.py .
+
+# Command to run the application
+CMD ["python", "app.py"]
+
+then running a few commands in the terminal:
+
+docker build -t my_python_app .
+
+docker run --rm -e MY_ENV_VAR=World my_python_app
+
+after these 2 the image is created in docker and the app is being run.
+
+
+In my opinion this exercise was hard for me, but made me understand a lot of things 
+about applications and docker. It made me think outside the box and do a lot of research
+online being sure i give the good commands. I went through a little problem until
+i found out how to install a text editor on cmd to make sure i create a Dockerfile 
+with no extension.
